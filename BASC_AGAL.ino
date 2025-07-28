@@ -16,7 +16,7 @@
 #include <WebServer.h>        // Llibreria per poder tenir el servidor web i actualitzar remotament
 #include <Update.h>           // Llibreria que pujar el fitxer del programa i el carrega 
 
-const String versio = "41-27/07/24";                                    // canviar per actualitzar versió a la caixa
+const String versio = "46-19/11/24";                                    // canviar per actualitzar versió a la caixa
 const String urlh = "https://bascula.eye-cam.com/receive.php";       // la URL de enviament pesatges
 const String urlm = "https://bascula.eye-cam.com/getidfrommac.php";  // la URL de registre de bàscula
 
@@ -42,16 +42,21 @@ WebServer server(80);
 // Connexions WIFI definides
 // -------------------------  Les WIFIS
 const char* ssid[] ={
-                     "Bascula",
-                     "Vodafone-891C",
+                      
+                      "IPhone de Jordi",
+                      "MOVISTAR_0F9D",
+                     //"Bascula",
+                     //"Vodafone-891C",
                      //"MOVISTAR_0F9D",
                      //"Bascula2",
                      };
 
 // --------------------------- Els passwords
 const char* password[] ={
-                      "Bascules#20#24",
-                      "TrXT9TKafCgqtJsR",
+                      "654321APB", // IPHONE JORDI
+                      "FC4431DA50DF72FA9999", // CASA JORDI
+                      //"Bascules#20#24", //
+                      //"TrXT9TKafCgqtJsR",
                       //"FC4431DA50DF72FA9999",
                       //"Bascules#20#24",
                       };
@@ -152,8 +157,9 @@ void setup() {
   pintaFig(versio[0],colorMagentaIntenso,4,1);       // Pinta en verd versió caracter esquerra 1 segon
   getSerial(); // segons + fasledshow + serial to led63
   Serial.print("Versió: ");
-  Serial.print(versio[1]);
-  Serial.println(versio[0]);
+  Serial.print(versio[0]);
+  Serial.println(versio[1]);
+  
   int i=0;                            //  Variable d'us general a bucles
   int sent = 1;                       //  Marca per saber si ha enviat o no
   int wi = 0;                         //  Variable per fer la divisió de la barra d'avan´de connexió 
@@ -163,6 +169,7 @@ void setup() {
   pintaFig(netId+1,colorMagentaIntenso,2,0);     // Carrega la ID de la WIFI a la que connecta en blau 
   FastLED.show();                     // Ho pinta als leds
   Serial.printf("Connectanta a xarxa %s ", ssid[netId]);  // Ho treu pel port serie de l'ordinador (per debug)
+  Serial.printf("Password %s ", password[netId]);
   while (WiFi.status() != WL_CONNECTED) {
       delay(500);                     // bucles de espera de 1/2 segon
       Serial.print(".");              // va treinet un punt pel port de l'ordinador (per debug)
@@ -174,6 +181,7 @@ void setup() {
         //FastLED.show();                // pinta el numero
         Serial.print("\nCanviant a la xarxa WiFi ");
         Serial.println(ssid[netId]);   // treu la id de la xarxa Wifi de conenxió pel port (per debug)
+        Serial.printf("Password %s ", password[netId]);
         WiFi.begin(ssid[netId], password[netId]); // connecta ala niova WiFi
       }
       leds[63-i].setRGB(0,(i*10), 60); //pinta el troç de barra en verd-blavós que augmenta
@@ -495,7 +503,7 @@ void wunder() {
     
     if (wunderLeerTrama){
       //Serial.println(trama);
-      if (trama2 != trama) { Serial.print(trama); Serial.print("  Fase: "); Serial.print(fase);Serial.print("  Peso: "); Serial.print(peso2); Serial.println("  ");}
+      if (trama2 != trama) { Serial.print(trama); Serial.print("  Fase: "); Serial.print(fase);Serial.print("  Peso: "); Serial.print(peso2); Serial.println("  "); }
       //Serial.println(trama);
 
       CalculaTramaWunder();
@@ -657,8 +665,11 @@ void ControlFases(){
           // statements
           //int pesoEnvio =  pesoEstable.toInt;///JORDI
           //Serial.print("xxxxxxxxxxxxAAxxxxxxxxxxxx Envioprevio "); Serial.println(envio);
+          
           envio =urlh+"?pue="+pue+"&ope="+String(ope)+"&idp="+String(idp)+"&est="+String(estadoEstable)+"&pes="+pesoEstable+"";
-          Serial.print("xxxxxxxxxxxxxxxxxxxxxxxx Envio "); Serial.println(envio);
+          Serial.print("xxxxxxxxxxxxxxxxxxxxxxxx Envio: "); Serial.println(envio);
+          Serial.print("xxxxxxxxxxxxxxxxxxxxxxxx PesoEstable:  "); Serial.println(pesoEstable);
+          Serial.print("xxxxxxxxxxxxxxxxxxxxxxxx EstadoEstable:  "); Serial.println(estadoEstable);
           http.begin(envio);
 
           int httpResponseCode = http.GET();               // espera ka resposta del servidor
