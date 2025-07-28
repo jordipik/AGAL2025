@@ -16,7 +16,7 @@
 #include <WebServer.h>        // Llibreria per poder tenir el servidor web i actualitzar remotament
 #include <Update.h>           // Llibreria que pujar el fitxer del programa i el carrega 
 
-const String versio = "34-19/11/24";                                    // canviar per actualitzar versió a la caixa
+const String versio = "35-19/11/24";                                    // canviar per actualitzar versió a la caixa
 const String urlh = "https://bascula.eye-cam.com/receive.php";       // la URL de enviament pesatges
 const String urlm = "https://bascula.eye-cam.com/getidfrommac.php";  // la URL de registre de bàscula
 
@@ -44,6 +44,9 @@ WebServer server(80);
 const char* ssid[] ={
                       //"MOVISTAR_0F9D",
                       "iPhone de Jordi",
+                      "iPhone de Jordi",
+                      "iPhone de Jordi",
+                      "iPhone de Jordi",
                      //"Bascula",
                      //"Vodafone-891C",
                      //"MOVISTAR_0F9D",
@@ -53,7 +56,10 @@ const char* ssid[] ={
 // --------------------------- Els passwords
 const char* password[] ={
                       //"FC4431DA50DF72FA9999", // CASA JORDI
-                      "5jnhcv5xg6jdd", // IPHONE JORDI
+                      "654321APB", // IPHONE JORDI
+                      "654321APB",
+                      "654321APB",
+                      "654321APB",
                       //"Bascules#20#24", //
                       //"TrXT9TKafCgqtJsR",
                       //"FC4431DA50DF72FA9999",
