@@ -16,7 +16,7 @@
 #include <WebServer.h>        // Llibreria per poder tenir el servidor web i actualitzar remotament
 #include <Update.h>           // Llibreria que pujar el fitxer del programa i el carrega 
 
-const String versio = "52-21/06/25";                                    // canviar per actualitzar versió a la caixa
+const String versio = "52"; //04-07-2025                                    // canviar per actualitzar versió a la caixa
 const String urlh = "https://bascula.eye-cam.com/receive.php";       // la URL de enviament pesatges
 const String urlm = "https://bascula.eye-cam.com/getidfrommac.php";  // la URL de registre de bàscula
 
@@ -43,7 +43,9 @@ WebServer server(80);
 // -------------------------  Les WIFIS
 const char* ssid[] ={
                      "Bascula",
-                     "Vodafone-891C",
+                     "Bascula",
+                     "Bascula",
+                     //"Vodafone-891C",
                      //"MOVISTAR_0F9D",
                      //"Bascula2",
                      };
@@ -51,7 +53,9 @@ const char* ssid[] ={
 // --------------------------- Els passwords
 const char* password[] ={
                       "Bascules#20#24",
-                      "TrXT9TKafCgqtJsR",
+                      "Bascules#20#24",
+                      "Bascules#20#24",
+                      //"TrXT9TKafCgqtJsR",
                       //"FC4431DA50DF72FA9999",
                       //"Bascules#20#24",
                       };
@@ -78,9 +82,19 @@ unsigned int dato = 0;
 unsigned int dato2 = 0;
 unsigned int hexString = 0;
 unsigned int pesok = 0;
+
+
 int enviado = 0;
 int peso2 = 0;
 int peso1 = 1;
+
+
+int  gramosDebajoMinimo = 10; // gramos por debajo del minimo que marcan el estado lila 9
+double  PorcentajeRangoPosibleInferior = .8; // Porcentaje del Peso Minimo para considerar el peso dentro de rango posible
+double  PorcentajeRangoPosibleSuperior = 1.6; // Porcentaje del Peso Minimo para considerar el peso dentro de rango posible
+double  LimiteSuperiorComprobacionConfeccion = 15000; // Limite Superior de ComprobacionConfeccion
+
+int estadoEnvio = 0;
 int pesoEstable = 0;
 int ultimoPesoInsta = 0;
 int Nivel
@@ -90,13 +104,15 @@ int Nivel
 long colorVerdeClaro = 0x000500;
 long colorVerdeIntenso = 0x001500;
 long colorRojoClaro = 0x050000;
-long colorRojoIntenso = 0x150000;
-long colorNaranjaClaro = 0x221100;
+long colorRojoIntenso = 0x300000;
+long colorLilaIntenso = 0x300030; //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+long colorNaranjaClaro = 0x150800;
 long colorNaranjaIntenso = 0x301500;
 long colorAmarilloClaro = 0x050500;
-long colorAmarilloIntenso = 0x151500;
+long colorAmarilloIntenso = 0x303000;
 long colorAzulClaro = 0x000010;
-long colorAzulIntenso = 0x000020;
+long colorLilaClaro = 0x100010; //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+long colorAzulIntenso = 0x000030;
 
 long colorMagentaClaro = 0x220022;
 long colorMagentaIntenso = 0x440044;
@@ -152,8 +168,8 @@ void setup() {
   pintaFig(versio[0],colorMagentaIntenso,4,1);       // Pinta en verd versió caracter esquerra 1 segon
   getSerial(); // segons + fasledshow + serial to led63
   Serial.print("Versió: ");
-  Serial.print(versio[1]);
-  Serial.println(versio[0]);
+  Serial.print(versio[0]);
+  Serial.println(versio[1]);
   int i=0;                            //  Variable d'us general a bucles
   int sent = 1;                       //  Marca per saber si ha enviat o no
   int wi = 0;                         //  Variable per fer la divisió de la barra d'avan´de connexió 
@@ -208,10 +224,11 @@ void setup() {
 
 void loop() { 
 
+
   for (tt=0;tt<50;tt++) { //loop every 500 ms
   if (tt % 10 == 0) server.handleClient(); // pasa cada 100ms
-  if (tip == 1 ) { gramZ3();} // si gramZ3
-  if (tip == 2 ) { wunder();} // si Wunder
+  if (tip == 1 ) { gramZ3();} // si gramZ3  ---------------------------------------------ERROR BUG JORDI 21/06/2025 NO FUNCIONA BIEN EL CODIGO DE BASCULA 2
+  if (tip == 2 ) { wunder();} // si Wunder 
   if (tip == 98 ) { TestOffline();}
   
   delay(5); //50*10 = 500ms 
@@ -297,15 +314,15 @@ void leepesoBBDD(){
       ptr = strtok(NULL, ","); if (ptr !=NULL) { idp = atoi(ptr);} else { idp =0; ptr="0000"; }  
       ptr = strtok(NULL, ","); if (ptr !=NULL) { pesok= atoi(ptr); } else { pesok = 0; ptr="0000"; }
       pintaptr4(ptr,colorRojoIntenso,2,1); //pinta ptr, color, delay 1, delay 2 (segs) 
-      Serial.println("-------------->");
-      Serial.println(versio);
+     // Serial.println("-------------->");
+      //Serial.println(versio);
       ptr = strtok(NULL, ","); if (ptr !=NULL) { minim = atoi(ptr); } else { minim = 0; ptr="0000"; }
       //pintaptr4(ptr,colorVerdeIntenso,2,1); //pinta ptr, color, delay 1, delay 2 (segs) 
       ptr = strtok(NULL, ","); if (ptr !=NULL) { maxim = atoi(ptr); } else { maxim = 0; ptr="0000"; } 
       //pintaptr4(ptr,colorNaranjaIntenso,2,1); //pinta ptr, color, delay 1, delay 2 (segs) 
-      ptr = strtok(NULL, ","); if (ptr !=NULL) { tip = atoi(ptr); } else { tip = 99; } 
+      ptr = strtok(NULL, ","); if (ptr !=NULL) { tip = atoi(ptr); } else { tip = 0; } //........................................................ERROR BUG NO PILLA LA WUNDER ME DEVUELVE SIEMPRE 0 JORDI: 21/06/2025
       ptr = strtok(NULL, ","); if (ptr !=NULL) { nom = ptr; } else { nom = "--"; }  //ptr = strtok(NULL, ",");
-      Serial.println("-------------->");
+      //Serial.println("-------------->");
       memset(leds, 0, sizeof(leds));
       pintaFig(nom[1],colorVerdeIntenso,0,1);
       pintaFig(nom[0],colorVerdeIntenso,4,1);
@@ -402,7 +419,7 @@ void getSerial(){
     if (mySerial.available()) { // mira si recibe datos por el serie bascula y los pinta
       int dato = mySerial.read();
       if ( dato != dato2 ) {
-        leds[63] = dato * 45000; // color del dato
+        leds[7] = dato * 45000; // color del dato - 63
       }
       dato2 = dato;
       }
@@ -495,7 +512,8 @@ void wunder() {
     
     if (wunderLeerTrama){
       //Serial.println(trama);
-      if (trama2 != trama) { Serial.print(trama); Serial.print("  Fase: "); Serial.print(fase);Serial.print("  Peso: "); Serial.print(peso2); Serial.println("  ");}
+      if (trama2 != trama) { Serial.print(trama); Serial.print("  Fase: "); Serial.print(fase); Serial.print("  Estado: "); Serial.print(estado); Serial.print("  Peso: "); Serial.print(peso2); Serial.println("  ");}
+      //minim*.95
       //Serial.println(trama);
 
       CalculaTramaWunder();
@@ -508,26 +526,26 @@ void wunder() {
 
 
 void ComprobarConfeccion(){
-    // //ACTUALIZA AUTOMATICAMENTE LA CONFECCION DE LA BASE DE DATOS
-    // PintaComprobacion();
-    // envio =urlh+"?pue="+pue+"&ope="+String(ope)+"&idp="+String(idp)+"&est="+String(estadoEstable)+"&pes="+pesoEstable+"";
-    // http.begin(envio);    
-    // int httpResponseCode = http.GET();               // espera ka resposta del servidor
-    //   if (httpResponseCode > 0) {                   // si la resposta es positiva  
-    //     Serial.print("Comprobamos Confección: HTTP ");                        // treu el codi de resposta
-    //     Serial.println(httpResponseCode);             // pel port de l'ordinador (per debug)
-    //     String payload = http.getString();            // guarda la resposta a variable "payload"
-    //     if (payload == "2")   {                       // si retorna  2es  que la ID de pes no es la actual
-    //         Serial.print(payload);
-    //         Serial.println(" ---- RECARREGA PESOS ----");         // treu pel port de l'ordinador (per debug)
-    //         leepesoBBDD();                            // crida a la funció per reiniciar i carregar dades
-    //       }
-    //   }  else {                                      // SI negatiu es un error de connexió
-    //   Serial.print("Codi de Error: ");             // treu el codi de error
-    //   Serial.println(httpResponseCode);             // pel port de l'ordinador (per debug)
-    //   Serial.println("Falla connexió :-(");          
-    //   }    
-    // http.end();      // Finalitza la conexió per alliberar recursos            
+     //ACTUALIZA AUTOMATICAMENTE LA CONFECCION DE LA BASE DE DATOS
+     PintaComprobacion();
+     envio =urlh+"?pue="+pue+"&ope="+String(ope)+"&idp="+String(idp)+"&est="+String(99)+"&pes="+0+"";
+     http.begin(envio);    
+     int httpResponseCode = http.GET();               // espera ka resposta del servidor
+       if (httpResponseCode > 0) {                   // si la resposta es positiva  
+         Serial.print("Comprobamos Confección: HTTP ");                        // treu el codi de resposta
+         Serial.println(httpResponseCode);             // pel port de l'ordinador (per debug)
+         String payload = http.getString();            // guarda la resposta a variable "payload"
+         if (payload == "2")   {                       // si retorna  2es  que la ID de pes no es la actual
+             Serial.print(payload);
+             Serial.println(" ---- RECARREGA PESOS ----");         // treu pel port de l'ordinador (per debug)
+             leepesoBBDD();                            // crida a la funció per reiniciar i carregar dades
+           }
+       }  else {                                      // SI negatiu es un error de connexió
+       Serial.print("Codi de Error: ");             // treu el codi de error
+       Serial.println(httpResponseCode);             // pel port de l'ordinador (per debug)
+       Serial.println("Falla connexió :-(");          
+       }    
+     http.end();      // Finalitza la conexió per alliberar recursos            
 
  }
 
@@ -557,7 +575,11 @@ void TestOffline(){
 
 bool PesoEnRangoPosible (){
     bool pesoEnRangoPosible;
-    if (peso2 >= (minim*0.8) && peso2 <= (maxim * 1.6)) {
+    if (peso2 >= (minim*PorcentajeRangoPosibleInferior) && peso2 <= (maxim * PorcentajeRangoPosibleSuperior)) {
+      //  Serial.print("  peso2: "); Serial.print(peso2);
+      //  Serial.print("  minim Rango: "); Serial.print(minim * PorcentajeRangoPosibleInferior);
+      //  Serial.print("  maxim Rango: "); Serial.println(maxim * PorcentajeRangoPosibleSuperior);
+
       pesoEnRangoPosible = true;
     }else{
       pesoEnRangoPosible = false;
@@ -567,6 +589,7 @@ bool PesoEnRangoPosible (){
 
 
 void ControlFases(){
+    
     switch (fase) 
       {
         case 0: //   FASE0 -  NO TARA 
@@ -574,25 +597,24 @@ void ControlFases(){
           CalculaTara();
           if ( tara == 1 ) { 
             fase = 1 ; 
-            Serial.println("-----------Cambio a Fase 1 Y Comprobamos Confeccion"); 
-            ComprobarConfeccion (); //COMPROBAMOS SI SE HA MODIFICADO LA CONFECCION} 
+            //Serial.println("-----------Cambio a Fase 1 Y Comprobamos Confeccion"); 
+            //ComprobarConfeccion (); //COMPROBAMOS SI SE HA MODIFICADO LA CONFECCION} 
             } //PASAMOS A FASE 1
             else {PintaPantalla();}
           break;
 
         case 1: //  FASE1 - TARA HECHA - ESTAMOS EN ESPERA DE PESO
           // statements
+            //Serial.print("-----------P2: ");
+            //Serial.println(peso2);
 
           if ( peso2 > 0 ) {
+
              fase = 2 ;
-             Serial.println("--------------Cambio a Fase 2");
+             //Serial.println("--------------Cambio a Fase 2");
               PintaPantalla();
               }
-          else if ( peso2 < -1000){
-            ComprobarConfeccion();
-            fase = 0;
-            //JORDI
-            PintaPantalla();}
+
           else {
             PintaPantalla();}
           break;
@@ -609,15 +631,20 @@ void ControlFases(){
               }
               else {
                 if (peso2 ==0) {
+                  //Serial.println("-----------Comprobamos Confeccion por peso 0"); 
+                  //ComprobarConfeccion (); //COMPROBAMOS SI SE HA MODIFICADO LA CONFECCION} 
                   fase = 1; 
                   estado= -1;
                   Serial.println("--------------Cambio a Fase 1");}
+
               }
             }else {  //NO ES ESTABLE
-              // if (peso2 > (maxim+5000)){
-              //   Serial.println("-----------Comprobamos Confeccion por sobrepeso"); 
-              //   ComprobarConfeccion (); //COMPROBAMOS SI SE HA MODIFICADO LA CONFECCION} 
-              // }
+                if ( peso2 >LimiteSuperiorComprobacionConfeccion){
+                  Serial.println("------------------------------------------------------------Comprobamos Confeccion"); 
+                  ComprobarConfeccion();
+                  fase = 0;
+                  //JORDI
+                  PintaPantalla();}
             }
           PintaPantalla();
           break;
@@ -635,7 +662,7 @@ void ControlFases(){
 
           if (peso2 < 0.200){
             fase = 4; 
-            Serial.println("----------------Cambio a Fase 4");
+            //Serial.println("----------------Cambio a Fase 4");
             } //PASAMOS A FASE 4 
             else{
 
@@ -643,7 +670,7 @@ void ControlFases(){
                   pesoEstable = 0; estadoEstable = 0;
                   estado= CalculaEstado(peso2);
                   fase = 2;
-                  Serial.println("---------------Cambio a Fase 2");;
+                  //Serial.println("---------------Cambio a Fase 2");
                   // Serial.print("Fase: ");
                   // Serial.println(fase);
                 } //SI SE ESTABILIZA EL PESO FUERA DE RANGOPOSIBLE VUELVE A LA FASE 2
@@ -657,7 +684,17 @@ void ControlFases(){
           // statements
           //int pesoEnvio =  pesoEstable.toInt;///JORDI
           //Serial.print("xxxxxxxxxxxxAAxxxxxxxxxxxx Envioprevio "); Serial.println(envio);
-          envio =urlh+"?pue="+pue+"&ope="+String(ope)+"&idp="+String(idp)+"&est="+String(estadoEstable)+"&pes="+pesoEstable+"";
+          fase = 0;
+          Serial.print("---------------Control de Fases: Fase "); Serial.println(fase); 
+          Serial.print("EstadoEstable: ");Serial.println(estadoEstable);
+          if (estadoEstable == 9){estadoEnvio == 0;}
+          else{
+            estadoEnvio == estadoEstable;
+          }
+          
+
+          Serial.print("EstadoEstable: ");Serial.println(estadoEstable);
+          envio =urlh+"?pue="+pue+"&ope="+String(ope)+"&idp="+String(idp)+"&est="+String(estadoEnvio)+"&pes="+pesoEstable+"";
           Serial.print("xxxxxxxxxxxxxxxxxxxxxxxx Envio "); Serial.println(envio);
           http.begin(envio);
 
@@ -681,10 +718,11 @@ void ControlFases(){
 
           pesoEstable = 0; 
           estadoEstable = 0;
+          estado = 0;
           tara = 0; //PONEMOS TARA A 0
           fase = 0; 
           Serial.println("----------------Cambio a Fase 0");
-          //PASAMOS A FASE 0hjjmc
+          //PASAMOS A FASE
           PintaPantalla();
           break;
           
@@ -744,14 +782,21 @@ void CalculaTramaGram(){
     //CALCULAR VALORES DE LA TRAMA WUNDER
     // ----------------------------------------------------------------------
     // Serial.println("Funcion CalculaTramaGram: Inicio");
-    // Serial.print("Peso: "); Serial.println(peso);
+    //Serial.print("Peso: "); Serial.println(peso);
     // Serial.print("Peso2: "); Serial.println(peso2);
+
+    
 
     peso.replace(".","");
     peso.replace("g","");
     peso.replace("k","");
     peso.replace("K","");
+
+    //Serial.print("Peso: "); Serial.println(peso);
+    //if (peso=="--------"){ComprobarConfeccion;}
     peso2 = peso.toInt();
+
+
     if (trama.indexOf("-0") == -1){peso.replace("-","");}
     
       // if (trama.indexOf("g") != -1){
@@ -799,20 +844,32 @@ void CalculaTara(){
 
     //if (tara == 0) {Serial.print(" SIN TARA");}
   }
-int CalculaEstado(int pesoTemp){
+int CalculaEstado(int pesoTemp) {
     int respuesta;
+
     // ----------------------------------------------------------------------
-    //CALCULAR ESTADO
+    // CALCULAR ESTADO
     // ----------------------------------------------------------------------
-    if ( pesoTemp >= minim && pesoTemp <= maxim ) { respuesta = 0 ;} //VERDE
-    if ( pesoTemp > maxim ) { respuesta = 1 ;} //AMARILLO 
-    if ( pesoTemp < minim ) { respuesta = -1  ;} //ROJO
+    if (pesoTemp > maxim) {
+        respuesta = 1; // AMARILLO
+    } else if (pesoTemp >= minim && pesoTemp <= maxim) {
+        respuesta = 0; // VERDE
+    } else if (pesoTemp >= minim -gramosDebajoMinimo && pesoTemp < minim) {
+        respuesta = 9; // LILA
+    } else if (pesoTemp < minim -gramosDebajoMinimo) {
+        respuesta = -1; // ROJO
+    } else {
+        respuesta = -99; // Valor por defecto si nada se cumple
+    }
+
+    // Serial.print("  PesoTemp: "); Serial.print(pesoTemp);
+    // Serial.print("  maxim: "); Serial.print(maxim);
+    // Serial.print("  minim: "); Serial.print(minim);
+    // Serial.print("  minim-gramosDebajoMinimo: "); Serial.print(minim -gramosDebajoMinimo);
+    // Serial.print("  respuesta: "); Serial.println(respuesta);
 
     return respuesta;
-    // ----------------------------------------------------------------------
-    //CALCULAR DIF
-    // ----------------------------------------------------------------------
-  }
+}
 void CalculaNivel(){
     float pesoOctavo = (float)pesok / 8 ;
     float numOctavos = (float)peso2 / (float)pesoOctavo;    
@@ -847,9 +904,11 @@ void PintaPantalla(){
   if(fase == 2) {  //  FASE 2   ---------------------------------------PINTA RESULTAT ENVIAMENT  (VERMELL, GROC O VERD) PUEDE SER OTRA INTENSIDAD QUE LA FASE 3
     memset(leds, 0, sizeof(leds));
     //Serial.println ("-------------------Pinta Fase 2");
+    //Serial.print("  Estado Fase2: "); Serial.println(estado);
     if(estado == 0) { colorLED = colorVerdeClaro ;} //VERDE
     else if(estado == 1) { colorLED = colorNaranjaClaro ;} //AMARILLO
     else if(estado == -1) { colorLED = colorRojoClaro ;} //ROJO
+    else if(estado == 9) { colorLED = colorLilaClaro ;} //LILA aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     else {colorLED = colorAzulClaro ;} //AZUL en caso de que el estado no sea ni 0 ni 1 ni -1
 
     for (int ll=0;ll<Nivel
@@ -862,6 +921,7 @@ void PintaPantalla(){
     if(estadoEstable == 0) { colorLEDESTABLE = colorVerdeIntenso ;} //VERDE
     else if(estadoEstable == 1) { colorLEDESTABLE = colorNaranjaIntenso ; } //AMARILLO
     else if(estadoEstable == -1) { colorLEDESTABLE = colorRojoIntenso ; } //ROJO
+    else if(estadoEstable == 9) { colorLEDESTABLE = colorLilaIntenso ;} //LILA aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     else {colorLEDESTABLE = colorAzulClaro ;} //AZUL en caso de que el estadoEstable no sea ni 0 ni 1 ni -1
 
 
@@ -882,6 +942,7 @@ void PintaPantalla(){
     //Hemos empujado la caja y enviado el peso
     memset(leds, 0, sizeof(leds));                  
     //Serial.println ("-------------------Pinta Fase 4");
+    if ( estadoEstable == 9  ) { pintaFig('&',colorLilaIntenso,0,1); } 
     if ( estadoEstable == 0  ) { pintaFig('&',colorVerdeIntenso,0,1); } 
     if ( estadoEstable == 1  ) { pintaFig('%',colorNaranjaIntenso,0,1); } 
     if ( estadoEstable == -1 ) { pintaFig('*',colorRojoIntenso,0,1); }
