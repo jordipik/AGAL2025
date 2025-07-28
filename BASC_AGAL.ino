@@ -16,7 +16,7 @@
 #include <WebServer.h>        // Llibreria per poder tenir el servidor web i actualitzar remotament
 #include <Update.h>           // Llibreria que pujar el fitxer del programa i el carrega 
 
-const String versio = "52"; //04-07-2025                                    // canviar per actualitzar versió a la caixa
+const String versio = "53"; //04-07-2025                                    // canviar per actualitzar versió a la caixa
 const String urlh = "https://bascula.eye-cam.com/receive.php";       // la URL de enviament pesatges
 const String urlm = "https://bascula.eye-cam.com/getidfrommac.php";  // la URL de registre de bàscula
 
@@ -92,7 +92,7 @@ int peso1 = 1;
 int  gramosDebajoMinimo = 10; // gramos por debajo del minimo que marcan el estado lila 9
 double  PorcentajeRangoPosibleInferior = .8; // Porcentaje del Peso Minimo para considerar el peso dentro de rango posible
 double  PorcentajeRangoPosibleSuperior = 1.6; // Porcentaje del Peso Minimo para considerar el peso dentro de rango posible
-double  LimiteSuperiorComprobacionConfeccion = 15000; // Limite Superior de ComprobacionConfeccion
+double  LimiteSuperiorComprobacionConfeccion = 20000; // Limite Superior de ComprobacionConfeccion
 
 int estadoEnvio = 0;
 int pesoEstable = 0;
@@ -649,7 +649,7 @@ void ControlFases(){
           PintaPantalla();
           break;
 
-        case 3: // FASE3  PESO ESTABLE Y DENTRO DE RANGOPOSIBLE - TENEMOS PESO ESTABBLE
+        case 3: // FASE3  PESO ESTABLE Y DENTRO DE RANGOPOSIBLE - TENEMOS PESO ESTABLE
           CalculaNivel();
           ultimoPesoInsta = peso2;
 
