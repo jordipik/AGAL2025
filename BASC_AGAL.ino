@@ -16,7 +16,7 @@
 #include <WebServer.h>        // Llibreria per poder tenir el servidor web i actualitzar remotament
 #include <Update.h>           // Llibreria que pujar el fitxer del programa i el carrega 
 
-const String versio = "53"; //04-07-2025                                    // canviar per actualitzar versió a la caixa
+const String versio = "54"; //04-07-2025                                    // canviar per actualitzar versió a la caixa
 const String urlh = "https://bascula.eye-cam.com/receive.php";       // la URL de enviament pesatges
 const String urlm = "https://bascula.eye-cam.com/getidfrommac.php";  // la URL de registre de bàscula
 
@@ -639,12 +639,20 @@ void ControlFases(){
 
               }
             }else {  //NO ES ESTABLE
+                Serial.println("------------------------------------------------------------Entra"); 
                 if ( peso2 >LimiteSuperiorComprobacionConfeccion){
                   Serial.println("------------------------------------------------------------Comprobamos Confeccion"); 
                   ComprobarConfeccion();
                   fase = 0;
                   //JORDI
                   PintaPantalla();}
+
+                // if ( peso2 <-1000){
+                //   Serial.println("------------------------------------------------------------Comprobamos Confeccion"); 
+                //   ComprobarConfeccion();
+                //   fase = 0;
+                //   //JORDI
+                //   PintaPantalla();} 
             }
           PintaPantalla();
           break;
