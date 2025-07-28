@@ -16,7 +16,7 @@
 #include <WebServer.h>        // Llibreria per poder tenir el servidor web i actualitzar remotament
 #include <Update.h>           // Llibreria que pujar el fitxer del programa i el carrega 
 
-const String versio = "60-28/07/25";                                    // canviar per actualitzar versió a la caixa
+const String versio = "61-29/07/25";                                    // Aquesta versio es una copia de la versio: BASC_DISP_WROOM32_J52     canviar per actualitzar versió a la caixa
 const String urlh = "https://bascula.eye-cam.com/receive.php";       // la URL de enviament pesatges
 const String urlm = "https://bascula.eye-cam.com/getidfrommac.php";  // la URL de registre de bàscula
 
@@ -307,7 +307,7 @@ void leepesoBBDD(){
       //pintaptr4(ptr,colorVerdeIntenso,2,1); //pinta ptr, color, delay 1, delay 2 (segs) 
       ptr = strtok(NULL, ","); if (ptr !=NULL) { maxim = atoi(ptr); } else { maxim = 0; ptr="0000"; } 
       //pintaptr4(ptr,colorNaranjaIntenso,2,1); //pinta ptr, color, delay 1, delay 2 (segs) 
-      ptr = strtok(NULL, ","); if (ptr !=NULL) { tip = atoi(ptr); } else { tip = 0; } 
+      ptr = strtok(NULL, ","); if (ptr !=NULL) { tip = atoi(ptr); } else { tip = 99; } 
       ptr = strtok(NULL, ","); if (ptr !=NULL) { nom = ptr; } else { nom = "--"; }  //ptr = strtok(NULL, ",");
       Serial.println("-------------->");
       memset(leds, 0, sizeof(leds));
