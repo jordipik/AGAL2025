@@ -16,7 +16,7 @@
 #include <WebServer.h>        // Llibreria per poder tenir el servidor web i actualitzar remotament
 #include <Update.h>           // Llibreria que pujar el fitxer del programa i el carrega 
 
-const String versio = "62"; //30-07-2025                                    // Copia de la verdio AGAL 52-----que incorpora el estado lila
+const String versio = "63"; //30-07-2025                                    // Copia de la verdio AGAL 52-----que incorpora el estado lila
 const String urlh = "https://bascula.eye-cam.com/receive.php";       // la URL de enviament pesatges
 const String urlm = "https://bascula.eye-cam.com/getidfrommac.php";  // la URL de registre de bàscula
 
@@ -44,7 +44,9 @@ WebServer server(80);
 const char* ssid[] ={
                      "Bascula",
                      "Bascula",
-                     "Bascula",
+                     "Jordi",
+                     //"Jordi",
+                     //"Jordi",
                      //"Vodafone-891C",
                      //"MOVISTAR_0F9D",
                      //"Bascula2",
@@ -54,7 +56,9 @@ const char* ssid[] ={
 const char* password[] ={
                       "Bascules#20#24",
                       "Bascules#20#24",
-                      "Bascules#20#24",
+                      "654321APB",
+                      //"654321APB",
+                      //"654321APB",
                       //"TrXT9TKafCgqtJsR",
                       //"FC4431DA50DF72FA9999",
                       //"Bascules#20#24",
@@ -180,7 +184,7 @@ void setup() {
   delay(1000);                         //   Retard a l'inici per esperar a que tot arrenqui
   WiFi.begin(ssid[0], password[0]);   // Carrega la WIFI amb la primera opció i password
   memset(leds, 0, sizeof(leds));      // Esborra l'espai dels LEDS a zero
-  pintaFig(netId+1,colorMagentaIntenso,2,0);     // Carrega la ID de la WIFI a la que connecta en blau 
+  pintaFig(netId+1,colorMagentaIntenso,2,0);      // netId+1   Carrega la ID de la WIFI a la que connecta en blau
   FastLED.show();                     // Ho pinta als leds
   Serial.printf("Connectanta a xarxa %s ", ssid[netId]);  // Ho treu pel port serie de l'ordinador (per debug)
   while (WiFi.status() != WL_CONNECTED) {
@@ -189,7 +193,12 @@ void setup() {
       if (++wi %28 == 0) {            // Bucle compket 3 iteraccions de 14s
         netId = (wi / 28) % 3;        // Canvia de xarxa cada 28 intents (14 segons)
         memset(leds, 0, sizeof(leds));// esborra tots els valors dels leds a zero
-        pintaFig(netId+1,colorMagentaIntenso,2,0);// posa les unitats en color nagenta (RRGGBB)
+        if (netId <= 1){
+          pintaFig(netId+1,colorMagentaIntenso,2,0);      // netId+1   Carrega la ID de la WIFI a la que connecta en blau
+        }else{
+          pintaFig('J',colorNaranjaIntenso,4,1);     // netId+1   Carrega la ID de la WIFI a la que connecta en blau
+          pintaFig('O',colorNaranjaIntenso,0,1);     // netId+1   Carrega la ID de la WIFI a la que connecta en blau   
+        }
         getSerial(); // segons + fasledshow + serial to led63
         //FastLED.show();                // pinta el numero
         Serial.print("\nCanviant a la xarxa WiFi ");
